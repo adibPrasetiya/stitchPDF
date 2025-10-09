@@ -4,14 +4,41 @@ import Image from "next/image";
 export default function DonatePage() {
   return (
     <>
-      {/* Page Header */}
-      <section className="page-header">
+      {/* Hero Section */}
+      <section className="page-header" style={{ paddingBottom: "4rem" }}>
         <Container>
-          <div className="text-center">
-            <h1 className="mb-3">❤️ Support StitchPDF</h1>
-            <p className="lead text-muted">
-              Love using our free PDF tools? Help us keep them free for
-              everyone!
+          <div
+            className="text-center"
+            style={{ maxWidth: "800px", margin: "0 auto" }}
+          >
+            <h1
+              className="mb-4"
+              style={{ fontSize: "3rem", fontWeight: "800" }}
+            >
+              Support StitchPDF
+            </h1>
+            <p
+              className="lead"
+              style={{
+                fontSize: "1.25rem",
+                color: "#6c757d",
+                lineHeight: "1.8",
+              }}
+            >
+              StitchPDF is a passion project built to help people work with PDFs
+              without restrictions.
+              <br />
+              <strong>100% free, no ads, no tracking, no watermarks.</strong>
+            </p>
+            <p
+              style={{
+                fontSize: "1.1rem",
+                color: "#6c757d",
+                marginTop: "1.5rem",
+              }}
+            >
+              If you find this tool valuable, consider supporting its
+              development and hosting costs.
             </p>
           </div>
         </Container>
@@ -20,269 +47,296 @@ export default function DonatePage() {
       {/* Main Content */}
       <Container>
         <div className="row justify-content-center">
-          <div className="col-lg-9">
-            {/* Impact Statement */}
-            <div
-              className="card p-4 mb-4"
-              style={{
-                background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-                border: "2px solid #dee2e6",
-              }}
-            >
-              <div className="text-center">
-                <h2
-                  className="mb-4"
-                  style={{ fontSize: "28px", fontWeight: "700" }}
-                >
-                  You&apos;ve Enjoyed Free PDF Tools. Help Others Do The Same! 🎉
-                </h2>
-                <p
-                  className="mb-0"
-                  style={{ fontSize: "18px", color: "#495057" }}
-                >
-                  StitchPDF has helped you manage your PDFs without paying a
-                  cent. With your support, we can keep it that way for everyone.
-                </p>
-              </div>
-            </div>
-
-            <div className="row g-4 mb-4">
-              {/* What You Get */}
-              <div className="col-md-6">
-                <div className="card h-100 p-4">
-                  <div className="text-center mb-3">
-                    <span style={{ fontSize: "48px" }}>✨</span>
-                  </div>
-                  <h4 className="text-center mb-3" style={{ color: "#ffc107" }}>
-                    What You Already Get
-                  </h4>
-                  <ul className="list-unstyled mb-0">
-                    <li className="mb-3 d-flex align-items-start">
-                      <span
-                        className="me-2"
-                        style={{ color: "#28a745", fontSize: "20px" }}
-                      >
-                        ✓
-                      </span>
-                      <span>
-                        <strong>100% Free</strong> - No hidden costs, ever
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span
-                        className="me-2"
-                        style={{ color: "#28a745", fontSize: "20px" }}
-                      >
-                        ✓
-                      </span>
-                      <span>
-                        <strong>Private & Secure</strong> - Files never leave
-                        your device
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span
-                        className="me-2"
-                        style={{ color: "#28a745", fontSize: "20px" }}
-                      >
-                        ✓
-                      </span>
-                      <span>
-                        <strong>No Ads</strong> - Clean, distraction-free
-                        experience
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span
-                        className="me-2"
-                        style={{ color: "#28a745", fontSize: "20px" }}
-                      >
-                        ✓
-                      </span>
-                      <span>
-                        <strong>No Watermarks</strong> - Your PDFs stay pristine
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span
-                        className="me-2"
-                        style={{ color: "#28a745", fontSize: "20px" }}
-                      >
-                        ✓
-                      </span>
-                      <span>
-                        <strong>Works Offline</strong> - Use it anywhere,
-                        anytime
-                      </span>
-                    </li>
-                    <li className="mb-0 d-flex align-items-start">
-                      <span
-                        className="me-2"
-                        style={{ color: "#28a745", fontSize: "20px" }}
-                      >
-                        ✓
-                      </span>
-                      <span>
-                        <strong>All Features Unlocked</strong> - No premium
-                        tiers
-                      </span>
-                    </li>
-                  </ul>
+          <div className="col-lg-10">
+            {/* Stats Section */}
+            <div className="row g-4 mb-5" style={{ textAlign: "center" }}>
+              <div className="col-md-3">
+                <div style={{ padding: "1.5rem" }}>
+                  <h3
+                    style={{
+                      fontSize: "2.5rem",
+                      fontWeight: "700",
+                      color: "var(--primary-yellow)",
+                      margin: "0",
+                    }}
+                  >
+                    100%
+                  </h3>
+                  <p
+                    style={{
+                      color: "#6c757d",
+                      marginTop: "0.5rem",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    Free Forever
+                  </p>
                 </div>
               </div>
-
-              {/* Your Support Helps */}
-              <div className="col-md-6">
-                <div
-                  className="card h-100 p-4"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #fff9e6 0%, #fffbea 100%)",
-                    border: "2px solid #ffc107",
-                  }}
-                >
-                  <div className="text-center mb-3">
-                    <span style={{ fontSize: "48px" }}>🚀</span>
-                  </div>
-                  <h4 className="text-center mb-3" style={{ color: "#5d4037" }}>
-                    Your Support Enables
-                  </h4>
-                  <ul className="list-unstyled mb-0">
-                    <li className="mb-3 d-flex align-items-start">
-                      <span className="me-2" style={{ fontSize: "20px" }}>
-                        💪
-                      </span>
-                      <span>
-                        <strong>Keep it Free</strong> - For students,
-                        professionals, everyone
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span className="me-2" style={{ fontSize: "20px" }}>
-                        ⚡
-                      </span>
-                      <span>
-                        <strong>Faster Development</strong> - More time for new
-                        features
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span className="me-2" style={{ fontSize: "20px" }}>
-                        🛠️
-                      </span>
-                      <span>
-                        <strong>More Tools</strong> - Sign, compress, and more
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span className="me-2" style={{ fontSize: "20px" }}>
-                        🌐
-                      </span>
-                      <span>
-                        <strong>Better Infrastructure</strong> - Reliable
-                        hosting & performance
-                      </span>
-                    </li>
-                    <li className="mb-3 d-flex align-items-start">
-                      <span className="me-2" style={{ fontSize: "20px" }}>
-                        🐛
-                      </span>
-                      <span>
-                        <strong>Quick Fixes</strong> - Rapid bug resolution &
-                        updates
-                      </span>
-                    </li>
-                    <li className="mb-0 d-flex align-items-start">
-                      <span className="me-2" style={{ fontSize: "20px" }}>
-                        ❌
-                      </span>
-                      <span>
-                        <strong>Stay Ad-Free</strong> - No need for intrusive
-                        monetization
-                      </span>
-                    </li>
-                  </ul>
+              <div className="col-md-3">
+                <div style={{ padding: "1.5rem" }}>
+                  <h3
+                    style={{
+                      fontSize: "2.5rem",
+                      fontWeight: "700",
+                      color: "var(--primary-yellow)",
+                      margin: "0",
+                    }}
+                  >
+                    6+
+                  </h3>
+                  <p
+                    style={{
+                      color: "#6c757d",
+                      marginTop: "0.5rem",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    PDF Tools
+                  </p>
+                </div>
+              </div>
+              <div className="col-md-3">
+                <div style={{ padding: "1.5rem" }}>
+                  <h3
+                    style={{
+                      fontSize: "2.5rem",
+                      fontWeight: "700",
+                      color: "var(--primary-yellow)",
+                      margin: "0",
+                    }}
+                  >
+                    0
+                  </h3>
+                  <p
+                    style={{
+                      color: "#6c757d",
+                      marginTop: "0.5rem",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    Ads or Trackers
+                  </p>
+                </div>
+              </div>
+              <div className="col-md-3">
+                <div style={{ padding: "1.5rem" }}>
+                  <h3
+                    style={{
+                      fontSize: "2.5rem",
+                      fontWeight: "700",
+                      color: "var(--primary-yellow)",
+                      margin: "0",
+                    }}
+                  >
+                    🔒
+                  </h3>
+                  <p
+                    style={{
+                      color: "#6c757d",
+                      marginTop: "0.5rem",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    Client-Side Only
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Donate CTA */}
+            {/* Why Support Section */}
             <div
-              className="card p-5 mb-4"
               style={{
-                background: "linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%)",
-                border: "3px solid #ffb74d",
-                boxShadow: "0 8px 24px rgba(255, 183, 77, 0.3)",
+                padding: "3rem 0",
+                borderTop: "1px solid #e9ecef",
+                borderBottom: "1px solid #e9ecef",
+                marginBottom: "3rem",
               }}
             >
-              <div className="text-center">
-                <h2
-                  className="mb-4"
-                  style={{
-                    color: "#5d4037",
-                    fontSize: "32px",
-                    fontWeight: "700",
-                  }}
-                >
-                  ☕ Buy Me a Coffee
-                </h2>
-                <p
-                  className="mb-4"
-                  style={{
-                    color: "#6d4c41",
-                    fontSize: "18px",
-                    maxWidth: "600px",
-                    margin: "0 auto 24px",
-                  }}
-                >
-                  Enjoyed merging, slicing, or converting your PDFs? <br />
-                  <strong>
-                    A coffee helps fuel more late-night coding sessions!
-                  </strong>
-                </p>
-                <div className="donate-buttons mb-4">
-                  <a
-                    href="https://buymeacoffee.com/abu_ibrahim"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="donate-btn donate-btn-coffee"
-                  >
-                    <Image
-                      src="/assets/images/coffee.png"
-                      alt="Coffee"
-                      width={24}
-                      height={24}
-                      style={{ objectFit: "contain" }}
-                    />
-                    Buy Me a Coffee
-                  </a>
-                  <a
-                    href="https://trakteer.id/abu_ibrahim"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="donate-btn donate-btn-trakteer"
-                  >
-                    <Image
-                      src="/assets/images/paw.png"
-                      alt="Trakteer"
-                      width={24}
-                      height={24}
-                      style={{ objectFit: "contain" }}
-                    />
-                    Trakteer
-                  </a>
+              <h2
+                className="text-center mb-4"
+                style={{ fontSize: "2rem", fontWeight: "700" }}
+              >
+                Why Support Matters
+              </h2>
+              <div className="row g-4">
+                <div className="col-md-6">
+                  <div style={{ padding: "1rem" }}>
+                    <h5
+                      style={{
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      💰 Cover Hosting Costs
+                    </h5>
+                    <p
+                      style={{
+                        color: "#6c757d",
+                        fontSize: "0.95rem",
+                        lineHeight: "1.7",
+                      }}
+                    >
+                      Running a web application costs money. Domain, hosting,
+                      and CDN services need to be maintained.
+                    </p>
+                  </div>
                 </div>
-                <p
-                  style={{
-                    color: "#8d6e63",
-                    fontSize: "14px",
-                    fontStyle: "italic",
-                  }}
-                >
-                  Every contribution, big or small, keeps the servers running
-                  and motivation high! 💛
-                </p>
+                <div className="col-md-6">
+                  <div style={{ padding: "1rem" }}>
+                    <h5
+                      style={{
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      🚀 Enable New Features
+                    </h5>
+                    <p
+                      style={{
+                        color: "#6c757d",
+                        fontSize: "0.95rem",
+                        lineHeight: "1.7",
+                      }}
+                    >
+                      Your support gives me time to add features like PDF
+                      compression, digital signatures, and more.
+                    </p>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div style={{ padding: "1rem" }}>
+                    <h5
+                      style={{
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      🛡️ Stay Ad-Free
+                    </h5>
+                    <p
+                      style={{
+                        color: "#6c757d",
+                        fontSize: "0.95rem",
+                        lineHeight: "1.7",
+                      }}
+                    >
+                      With community support, StitchPDF can remain completely
+                      free without resorting to ads or paywalls.
+                    </p>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div style={{ padding: "1rem" }}>
+                    <h5
+                      style={{
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      ⚡ Faster Updates
+                    </h5>
+                    <p
+                      style={{
+                        color: "#6c757d",
+                        fontSize: "0.95rem",
+                        lineHeight: "1.7",
+                      }}
+                    >
+                      More resources mean faster bug fixes, performance
+                      improvements, and feature development.
+                    </p>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            {/* CTA Section */}
+            <div
+              className="text-center"
+              style={{
+                padding: "3rem 2rem",
+                background: "linear-gradient(135deg, #fffbf0 0%, #fff8e1 100%)",
+                borderRadius: "16px",
+                marginBottom: "3rem",
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "2rem",
+                  fontWeight: "700",
+                  marginBottom: "1rem",
+                }}
+              >
+                Support the Project
+              </h2>
+              <p
+                style={{
+                  fontSize: "1.1rem",
+                  color: "#6c757d",
+                  maxWidth: "600px",
+                  margin: "0 auto 2.5rem",
+                  lineHeight: "1.7",
+                }}
+              >
+                Every contribution helps keep StitchPDF running and improving.
+                <br />
+                Choose your preferred platform below.
+              </p>
+
+              <div
+                className="donate-buttons"
+                style={{ marginBottom: "1.5rem" }}
+              >
+                <a
+                  href="https://buymeacoffee.com/abu_ibrahim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="donate-btn donate-btn-coffee"
+                  style={{ margin: "0.5rem" }}
+                >
+                  <Image
+                    src="/assets/images/coffee.png"
+                    alt="Coffee"
+                    width={24}
+                    height={24}
+                    style={{ objectFit: "contain" }}
+                  />
+                  Buy Me a Coffee
+                </a>
+                <a
+                  href="https://trakteer.id/abu_ibrahim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="donate-btn donate-btn-trakteer"
+                  style={{ margin: "0.5rem" }}
+                >
+                  <Image
+                    src="/assets/images/paw.png"
+                    alt="Trakteer"
+                    width={24}
+                    height={24}
+                    style={{ objectFit: "contain" }}
+                  />
+                  Trakteer
+                </a>
+              </div>
+
+              <p
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#8d6e63",
+                  fontStyle: "italic",
+                  margin: "0",
+                }}
+              >
+                Your support, no matter the size, makes a real difference. Thank
+                you! 🙏
+              </p>
             </div>
           </div>
         </div>
