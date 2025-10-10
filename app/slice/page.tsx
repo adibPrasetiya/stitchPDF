@@ -5,10 +5,28 @@ import { PDFDocument } from "pdf-lib";
 import Container from "@/components/Container";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+
+interface PageRange {
+  id: string;
+  fromPage: number;
+  toPage: number;
+  customPages?: number[]; // For custom page selection like 3,4,9
+  customPagesInput?: string; // Raw input string for custom pages
+  isCustom?: boolean; // Flag to differentiate custom vs range
+}
+
+interface PageThumbnail {
+  pageNumber: number;
+  thumbnail: string;
+}
 
 export default function SlicePage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [pageRanges, setPageRanges] = useState<string>("");
+  const [ranges, setRanges] = useState<PageRange[]>([
+    { id: "1", fromPage: 1, toPage: 1 },
+  ]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "danger">(
@@ -16,6 +34,42 @@ export default function SlicePage() {
   );
   const [totalPages, setTotalPages] = useState<number>(0);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [mergeAllRanges, setMergeAllRanges] = useState(false);
+  const [pageThumbnails, setPageThumbnails] = useState<PageThumbnail[]>([]);
+
+  const generateThumbnail = async (
+    file: File,
+    pageNum: number
+  ): Promise<string> => {
+    try {
+      const pdfjsLib = await import("pdfjs-dist");
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      const page = await pdf.getPage(pageNum);
+
+      const viewport = page.getViewport({ scale: 0.5 });
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      if (!context) return "";
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({
+        canvasContext: context,
+        viewport: viewport,
+      }).promise;
+
+      return canvas.toDataURL();
+    } catch (error) {
+      console.error("Error generating thumbnail:", error);
+      return "";
+    }
+  };
 
   const loadPdfFile = async (file: File) => {
     if (file.type !== "application/pdf") {
@@ -26,16 +80,33 @@ export default function SlicePage() {
 
     setPdfFile(file);
     setMessage("");
+    setLoading(true);
 
     // Get total pages
     try {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await PDFDocument.load(arrayBuffer);
-      setTotalPages(pdf.getPageCount());
+      const pageCount = pdf.getPageCount();
+      setTotalPages(pageCount);
+
+      // Set initial range
+      if (pageCount > 0) {
+        setRanges([{ id: "1", fromPage: 1, toPage: Math.min(5, pageCount) }]);
+      }
+
+      // Generate thumbnails for all pages
+      const thumbnails: PageThumbnail[] = [];
+      for (let i = 1; i <= pageCount; i++) {
+        const thumbnail = await generateThumbnail(file, i);
+        thumbnails.push({ pageNumber: i, thumbnail });
+      }
+      setPageThumbnails(thumbnails);
     } catch (error) {
       console.error(error);
       setMessage("Error reading PDF file.");
       setMessageType("danger");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,46 +140,77 @@ export default function SlicePage() {
     e.preventDefault();
   };
 
-  const parsePageRanges = (input: string): number[][] => {
-    const ranges: number[][] = [];
-    const parts = input
-      .split(";")
-      .map((p) => p.trim())
-      .filter((p) => p);
+  const addRange = () => {
+    const lastRange = ranges[ranges.length - 1];
+    const newFromPage = lastRange ? lastRange.toPage + 1 : 1;
+    const newToPage = Math.min(newFromPage + 4, totalPages);
 
-    for (const part of parts) {
-      const pages: number[] = [];
-      const segments = part
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s);
+    setRanges([
+      ...ranges,
+      {
+        id: Date.now().toString(),
+        fromPage: newFromPage,
+        toPage: newToPage,
+        isCustom: false,
+      },
+    ]);
+  };
 
-      for (const segment of segments) {
-        if (segment.includes("-")) {
-          const [start, end] = segment
-            .split("-")
-            .map((n) => parseInt(n.trim()));
-          if (isNaN(start) || isNaN(end) || start < 1 || end < start) {
-            throw new Error(`Invalid range: ${segment}`);
-          }
-          for (let i = start; i <= end; i++) {
-            pages.push(i);
-          }
-        } else {
-          const pageNum = parseInt(segment);
-          if (isNaN(pageNum) || pageNum < 1) {
-            throw new Error(`Invalid page number: ${segment}`);
-          }
-          pages.push(pageNum);
-        }
-      }
+  const addCustomPage = () => {
+    setRanges([
+      ...ranges,
+      {
+        id: Date.now().toString(),
+        fromPage: 1,
+        toPage: 1,
+        customPages: [1],
+        customPagesInput: "1",
+        isCustom: true,
+      },
+    ]);
+  };
 
-      if (pages.length > 0) {
-        ranges.push(pages);
-      }
+  const removeRange = (id: string) => {
+    if (ranges.length > 1) {
+      setRanges(ranges.filter((r) => r.id !== id));
     }
+  };
 
-    return ranges;
+  const updateRange = (
+    id: string,
+    field: "fromPage" | "toPage",
+    value: number
+  ) => {
+    setRanges(
+      ranges.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              [field]: Math.max(1, Math.min(value, totalPages)),
+            }
+          : r
+      )
+    );
+  };
+
+  const updateCustomPages = (id: string, pagesString: string) => {
+    // Parse the input to get valid page numbers
+    const pages = pagesString
+      .split(",")
+      .map((p) => parseInt(p.trim()))
+      .filter((p) => !isNaN(p) && p >= 1 && p <= totalPages);
+
+    setRanges(
+      ranges.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              customPagesInput: pagesString, // Store raw input
+              customPages: pages, // Store parsed array
+            }
+          : r
+      )
+    );
   };
 
   const handleSlicePdf = async () => {
@@ -118,79 +220,143 @@ export default function SlicePage() {
       return;
     }
 
-    if (!pageRanges.trim()) {
-      setMessage("Please enter page ranges!");
+    if (ranges.length === 0) {
+      setMessage("Please add at least one range!");
       setMessageType("danger");
       return;
+    }
+
+    // Validate ranges
+    for (const range of ranges) {
+      if (range.isCustom) {
+        if (!range.customPages || range.customPages.length === 0) {
+          setMessage("Custom page selection cannot be empty!");
+          setMessageType("danger");
+          return;
+        }
+      } else {
+        if (range.fromPage > range.toPage) {
+          setMessage(
+            `Invalid range: ${range.fromPage} to ${range.toPage}. Start page must be less than or equal to end page.`
+          );
+          setMessageType("danger");
+          return;
+        }
+        if (range.fromPage < 1 || range.toPage > totalPages) {
+          setMessage(
+            `Invalid range: ${range.fromPage} to ${range.toPage}. Pages must be between 1 and ${totalPages}.`
+          );
+          setMessageType("danger");
+          return;
+        }
+      }
     }
 
     setLoading(true);
     setMessage("");
 
     try {
-      const ranges = parsePageRanges(pageRanges);
-
-      if (ranges.length === 0) {
-        setMessage("No valid page ranges found!");
-        setMessageType("danger");
-        setLoading(false);
-        return;
-      }
-
       const pdfBytes = await pdfFile.arrayBuffer();
       const sourcePdf = await PDFDocument.load(pdfBytes);
 
-      // Validate page numbers
-      for (const range of ranges) {
-        for (const pageNum of range) {
-          if (pageNum > sourcePdf.getPageCount()) {
-            setMessage(
-              `Page ${pageNum} does not exist! PDF has only ${sourcePdf.getPageCount()} pages.`
-            );
-            setMessageType("danger");
-            setLoading(false);
-            return;
-          }
-        }
-      }
-
-      // Create sliced PDFs
-      const slicedPdfs: Blob[] = [];
-      for (let i = 0; i < ranges.length; i++) {
+      if (mergeAllRanges) {
+        // Merge all ranges into one PDF
         const newPdf = await PDFDocument.create();
-        const pageIndices = ranges[i].map((p) => p - 1); // Convert to 0-indexed
 
-        const copiedPages = await newPdf.copyPages(sourcePdf, pageIndices);
-        copiedPages.forEach((page) => newPdf.addPage(page));
+        for (const range of ranges) {
+          const pageIndices = [];
 
-        const pdfBytes = await newPdf.save();
-        const arrayBuffer = pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength) as ArrayBuffer;
+          if (range.isCustom && range.customPages) {
+            // For custom pages, use the custom page array
+            range.customPages.forEach((pageNum) => {
+              pageIndices.push(pageNum - 1); // Convert to 0-indexed
+            });
+          } else {
+            // For ranges, iterate from fromPage to toPage
+            for (let i = range.fromPage; i <= range.toPage; i++) {
+              pageIndices.push(i - 1); // Convert to 0-indexed
+            }
+          }
+
+          const copiedPages = await newPdf.copyPages(sourcePdf, pageIndices);
+          copiedPages.forEach((page) => newPdf.addPage(page));
+        }
+
+        const pdfBytesOut = await newPdf.save();
+        const arrayBuffer = pdfBytesOut.buffer.slice(
+          pdfBytesOut.byteOffset,
+          pdfBytesOut.byteOffset + pdfBytesOut.byteLength
+        ) as ArrayBuffer;
         const blob = new Blob([arrayBuffer], { type: "application/pdf" });
-        slicedPdfs.push(blob);
-      }
 
-      // Download all sliced PDFs
-      slicedPdfs.forEach((blob, index) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `sliced-part-${index + 1}.pdf`;
+        link.download = `sliced-merged.pdf`;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 100);
-      });
 
-      setMessage(
-        `Successfully sliced PDF into ${slicedPdfs.length} file(s) and downloaded!`
-      );
-      setMessageType("success");
+        setMessage("Successfully created merged PDF from all ranges!");
+        setMessageType("success");
+      } else {
+        // Create separate PDFs for each range
+        const slicedPdfs: Blob[] = [];
 
-      // Reload page after successful merge
+        for (const range of ranges) {
+          const newPdf = await PDFDocument.create();
+          const pageIndices = [];
+
+          if (range.isCustom && range.customPages) {
+            // For custom pages, use the custom page array
+            range.customPages.forEach((pageNum) => {
+              pageIndices.push(pageNum - 1); // Convert to 0-indexed
+            });
+          } else {
+            // For ranges, iterate from fromPage to toPage
+            for (let i = range.fromPage; i <= range.toPage; i++) {
+              pageIndices.push(i - 1); // Convert to 0-indexed
+            }
+          }
+
+          const copiedPages = await newPdf.copyPages(sourcePdf, pageIndices);
+          copiedPages.forEach((page) => newPdf.addPage(page));
+
+          const pdfBytesOut = await newPdf.save();
+          const arrayBuffer = pdfBytesOut.buffer.slice(
+            pdfBytesOut.byteOffset,
+            pdfBytesOut.byteOffset + pdfBytesOut.byteLength
+          ) as ArrayBuffer;
+          const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+          slicedPdfs.push(blob);
+        }
+
+        // Download all sliced PDFs
+        slicedPdfs.forEach((blob, index) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `sliced-part-${index + 1}.pdf`;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 100);
+        });
+
+        setMessage(
+          `Successfully sliced PDF into ${slicedPdfs.length} file(s) and downloaded!`
+        );
+        setMessageType("success");
+      }
+
+      // Reload page after successful operation
       setTimeout(() => {
         window.location.reload();
       }, 1500);
     } catch (error: unknown) {
       console.error(error);
-      setMessage(error instanceof Error ? error.message : "An error occurred while slicing PDF.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while slicing PDF."
+      );
       setMessageType("danger");
     } finally {
       setLoading(false);
@@ -216,306 +382,555 @@ export default function SlicePage() {
         </div>
       )}
 
-      {/* Page Header */}
-      <section className="page-header">
-        <Container>
-          <div className="text-center">
-            <h1 className="mb-3">Slice PDF into Parts</h1>
-            <p className="lead text-muted">
-              Select pages or page ranges and split your PDF into multiple files
-            </p>
-          </div>
-        </Container>
-      </section>
-
       {/* Main Content */}
       <Container>
-        <div className="row justify-content-center">
-          <div className="col-lg-8">
-            <div className="feature-card">
-              {/* Upload Area */}
-              <div
-                className={`pdf-upload-zone ${
-                  isDraggingOver ? "dragging-over" : ""
-                } ${pdfFile ? "file-uploaded" : ""}`}
-                onDrop={handleFileDrop}
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-              >
-                {!pdfFile ? (
-                  <>
-                    <div className="upload-icon mb-3">
-                      <svg
-                        width="80"
-                        height="80"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                      </svg>
-                    </div>
-                    <h5 className="mb-2">
-                      Drag & drop your PDF here{" "}
-                      <span className="text-muted">or click to upload</span>
-                    </h5>
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      onChange={handleFileSelect}
-                      style={{ display: "none" }}
-                      id="pdf-file-input"
-                    />
-                    <label
-                      htmlFor="pdf-file-input"
-                      className="btn btn-primary mt-3"
+        {!pdfFile ? (
+          <div className="row justify-content-center">
+            <div className="col-lg-10">
+              <div className="feature-card">
+                {/* Upload Area */}
+                <div
+                  className={`pdf-upload-zone ${
+                    isDraggingOver ? "dragging-over" : ""
+                  }`}
+                  onDrop={handleFileDrop}
+                  onDragOver={handleDragOver}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                >
+                  <div className="upload-icon mb-3">
+                    <svg
+                      width="80"
+                      height="80"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
                     >
-                      Choose File
-                    </label>
-                  </>
-                ) : (
-                  <div className="uploaded-file-display">
-                    <div className="uploaded-file-icon mb-3">
-                      <svg
-                        width="80"
-                        height="80"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
-                          fill="#4a90e2"
-                          fillOpacity="0.15"
-                        />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                        <polyline points="10 9 9 9 8 9" />
-                      </svg>
-                    </div>
-                    <h5 className="mb-3 text-success">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        style={{ marginRight: "8px", verticalAlign: "middle" }}
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      File uploaded successfully!
-                    </h5>
-                    <div className="file-info mb-3">
-                      <div className="fw-bold">{pdfFile.name}</div>
-                      <div className="text-muted">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                          <polyline points="14 2 14 8 20 8" />
-                        </svg>
-                        {totalPages} {totalPages === 1 ? "page" : "pages"}
-                      </div>
-                    </div>
-                    <button
-                      className="btn btn-outline-danger btn-sm"
-                      onClick={() => {
-                        setPdfFile(null);
-                        setTotalPages(0);
-                        setPageRanges("");
-                        setMessage("");
+                      <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  </div>
+                  <h5 className="mb-2">Drag & drop your PDF here</h5>
+                  <p className="text-muted mb-3">or</p>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileSelect}
+                    style={{ display: "none" }}
+                    id="pdf-file-input"
+                  />
+                  <label htmlFor="pdf-file-input" className="btn btn-primary">
+                    Choose File
+                  </label>
+                </div>
+
+                {message && <Alert message={message} type={messageType} />}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="row">
+            {/* Left: Canvas with Thumbnails */}
+            <div className="col-lg-8">
+              {/* Thumbnails Grid with Range Visualization */}
+              <div>
+                {ranges.map((range, rangeIndex) => {
+                  const pagesInRange: PageThumbnail[] = [];
+
+                  if (range.isCustom && range.customPages) {
+                    // For custom pages, show all selected pages
+                    range.customPages.forEach((pageNum) => {
+                      const thumb = pageThumbnails.find(
+                        (t) => t.pageNumber === pageNum
+                      );
+                      if (thumb) pagesInRange.push(thumb);
+                    });
+                  } else {
+                    // For ranges, only show first and last page
+                    const firstThumb = pageThumbnails.find(
+                      (t) => t.pageNumber === range.fromPage
+                    );
+                    const lastThumb = pageThumbnails.find(
+                      (t) => t.pageNumber === range.toPage
+                    );
+
+                    if (firstThumb) pagesInRange.push(firstThumb);
+                    if (
+                      lastThumb &&
+                      range.fromPage !== range.toPage
+                    ) {
+                      pagesInRange.push(lastThumb);
+                    }
+                  }
+
+                  if (pagesInRange.length === 0) return null;
+
+                  // Color for each range
+                  const rangeColors = [
+                    { border: "#ffc107", bg: "#fff9e6" },
+                    { border: "#e91e63", bg: "#fce4ec" },
+                    { border: "#9c27b0", bg: "#f3e5f5" },
+                    { border: "#2196f3", bg: "#e3f2fd" },
+                    { border: "#4caf50", bg: "#e8f5e9" },
+                    { border: "#ff5722", bg: "#fbe9e7" },
+                  ];
+                  const color = rangeColors[rangeIndex % rangeColors.length];
+
+                  return (
+                    <div
+                      key={range.id}
+                      style={{
+                        border: `3px solid ${color.border}`,
+                        borderRadius: "16px",
+                        padding: "20px",
+                        marginBottom: "24px",
+                        background: color.bg,
+                        position: "relative",
                       }}
                     >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        style={{ marginRight: "6px", verticalAlign: "middle" }}
+                      {/* Range Label */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-14px",
+                          left: "20px",
+                          background: color.border,
+                          color: rangeIndex % 3 === 0 ? "#000" : "#fff",
+                          padding: "6px 20px",
+                          borderRadius: "20px",
+                          fontWeight: "700",
+                          fontSize: "14px",
+                          boxShadow: `0 4px 12px ${color.border}66`,
+                        }}
                       >
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                      Remove File
-                    </button>
+                        {range.isCustom
+                          ? `Custom Pages ${rangeIndex + 1}`
+                          : `Range ${rangeIndex + 1}`}
+                      </div>
+
+                      {/* Pages Grid */}
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns:
+                            "repeat(auto-fill, minmax(140px, 1fr))",
+                          gap: "16px",
+                          marginTop: "12px",
+                        }}
+                      >
+                        {pagesInRange.map((page, pageIdx) => {
+                          const isLast = pageIdx === pagesInRange.length - 1;
+                          const showConnector =
+                            pagesInRange.length > 1 && !isLast;
+
+                          return (
+                            <div
+                              key={page.pageNumber}
+                              style={{
+                                position: "relative",
+                              }}
+                            >
+                              {/* Page Card */}
+                              <div
+                                style={{
+                                  background: "#fff",
+                                  border: `2px solid ${color.border}`,
+                                  borderRadius: "10px",
+                                  overflow: "hidden",
+                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                  transition: "all 0.3s ease",
+                                }}
+                              >
+                                {/* Thumbnail */}
+                                <div
+                                  style={{
+                                    width: "100%",
+                                    height: "160px",
+                                    background: "#f8f9fa",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    overflow: "hidden",
+                                    position: "relative",
+                                  }}
+                                >
+                                  {page.thumbnail ? (
+                                    <img
+                                      src={page.thumbnail}
+                                      alt={`Page ${page.pageNumber}`}
+                                      style={{
+                                        maxWidth: "100%",
+                                        maxHeight: "100%",
+                                        objectFit: "contain",
+                                      }}
+                                    />
+                                  ) : (
+                                    <svg
+                                      width="50"
+                                      height="50"
+                                      viewBox="0 0 24 24"
+                                      fill="#4a90e2"
+                                      stroke="currentColor"
+                                      strokeWidth="1"
+                                    >
+                                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                      <polyline points="14 2 14 8 20 8" />
+                                    </svg>
+                                  )}
+                                </div>
+
+                                {/* Page Number */}
+                                <div
+                                  style={{
+                                    padding: "8px",
+                                    textAlign: "center",
+                                    background: "#fff",
+                                    borderTop: `1px solid ${color.border}33`,
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      fontSize: "13px",
+                                      fontWeight: "600",
+                                      color: "#212529",
+                                    }}
+                                  >
+                                    Page {page.pageNumber}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Connector Line (dotted) */}
+                              {showConnector && (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    right: "-16px",
+                                    width: "16px",
+                                    height: "3px",
+                                    backgroundImage: `linear-gradient(to right, ${color.border} 40%, transparent 0%)`,
+                                    backgroundSize: "8px 3px",
+                                    backgroundRepeat: "repeat-x",
+                                    zIndex: 1,
+                                  }}
+                                />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right: Sticky Sidebar with Split Mode */}
+            <div className="col-lg-4">
+              <div
+                style={{
+                  position: "sticky",
+                  top: "24px",
+                }}
+              >
+                {/* Range Mode Selection */}
+                <div
+                  style={{
+                    background: "#fff",
+                    borderRadius: "12px",
+                    padding: "24px",
+                    marginBottom: "24px",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  {/* Ranges List */}
+                  <div>
+                    {ranges.map((range, index) => (
+                      <div
+                        key={range.id}
+                        style={{
+                          background: "#f8f9fa",
+                          border: "2px solid #e9ecef",
+                          borderRadius: "12px",
+                          padding: "20px",
+                          marginBottom: "16px",
+                          transition: "all 0.3s ease",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "16px",
+                            marginBottom: "12px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              background:
+                                "linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-yellow-dark) 100%)",
+                              color: "#000",
+                              borderRadius: "8px",
+                              padding: "8px 16px",
+                              fontWeight: "700",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {range.isCustom
+                              ? `Custom ${index + 1}`
+                              : `Range ${index + 1}`}
+                          </div>
+                          {ranges.length > 1 && (
+                            <button
+                              onClick={() => removeRange(range.id)}
+                              style={{
+                                background: "none",
+                                border: "none",
+                                color: "#dc3545",
+                                cursor: "pointer",
+                                fontSize: "20px",
+                                padding: "0",
+                                width: "30px",
+                                height: "30px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                borderRadius: "50%",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background =
+                                  "rgba(220, 53, 69, 0.1)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "none";
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                          )}
+                        </div>
+
+                        {range.isCustom ? (
+                          <div>
+                            <label
+                              style={{
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                color: "#6c757d",
+                                marginBottom: "8px",
+                                display: "block",
+                              }}
+                            >
+                              Pages (comma separated, e.g., 3, 4, 9)
+                            </label>
+                            <input
+                              type="text"
+                              value={range.customPagesInput || ""}
+                              onChange={(e) =>
+                                updateCustomPages(range.id, e.target.value)
+                              }
+                              className="form-control"
+                              placeholder="1, 2, 3"
+                              style={{
+                                textAlign: "center",
+                                fontWeight: "600",
+                                fontSize: "16px",
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns: "1fr auto 1fr",
+                              gap: "16px",
+                              alignItems: "center",
+                            }}
+                          >
+                            <div>
+                              <label
+                                style={{
+                                  fontSize: "13px",
+                                  fontWeight: "600",
+                                  color: "#6c757d",
+                                  marginBottom: "8px",
+                                  display: "block",
+                                }}
+                              >
+                                from page
+                              </label>
+                              <input
+                                type="number"
+                                min="1"
+                                max={totalPages}
+                                value={range.fromPage}
+                                onChange={(e) =>
+                                  updateRange(
+                                    range.id,
+                                    "fromPage",
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="form-control"
+                                style={{
+                                  textAlign: "center",
+                                  fontWeight: "600",
+                                  fontSize: "16px",
+                                }}
+                              />
+                            </div>
+
+                            <div
+                              style={{
+                                fontSize: "20px",
+                                fontWeight: "600",
+                                color: "#6c757d",
+                                paddingTop: "24px",
+                              }}
+                            >
+                              to
+                            </div>
+
+                            <div>
+                              <label
+                                style={{
+                                  fontSize: "13px",
+                                  fontWeight: "600",
+                                  color: "#6c757d",
+                                  marginBottom: "8px",
+                                  display: "block",
+                                }}
+                              >
+                                to page
+                              </label>
+                              <input
+                                type="number"
+                                min="1"
+                                max={totalPages}
+                                value={range.toPage}
+                                onChange={(e) =>
+                                  updateRange(
+                                    range.id,
+                                    "toPage",
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="form-control"
+                                style={{
+                                  textAlign: "center",
+                                  fontWeight: "600",
+                                  fontSize: "16px",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Range Button */}
+                  <button
+                    onClick={addRange}
+                    className="btn btn-outline-danger"
+                    style={{
+                      borderRadius: "8px",
+                      padding: "10px 24px",
+                      fontWeight: "600",
+                      width: "100%",
+                      border: "2px dashed #dc3545",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{ marginRight: "8px" }}
+                    />
+                    Add Range
+                  </button>
+
+                  {/* Add Custom Page Button */}
+                  <button
+                    onClick={addCustomPage}
+                    className="btn btn-outline-secondary"
+                    style={{
+                      borderRadius: "8px",
+                      padding: "10px 24px",
+                      fontWeight: "600",
+                      width: "100%",
+                      border: "2px dashed #6c757d",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{ marginRight: "8px" }}
+                    />
+                    Add Custom Page
+                  </button>
+
+                  {/* Merge Checkbox */}
+                  <div
+                    style={{
+                      marginTop: "24px",
+                      padding: "20px",
+                      background: "linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%)",
+                      borderRadius: "12px",
+                      border: "2px solid var(--primary-yellow)",
+                      boxShadow: "0 2px 8px rgba(255, 193, 7, 0.15)",
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        margin: 0,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={mergeAllRanges}
+                        onChange={(e) => setMergeAllRanges(e.target.checked)}
+                        style={{
+                          width: "22px",
+                          height: "22px",
+                          marginRight: "14px",
+                          cursor: "pointer",
+                          accentColor: "var(--primary-yellow)",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "15px",
+                          fontWeight: "600",
+                          color: "#333",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        Merge all ranges into one PDF file
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Split Button */}
+                <div>
+                  <Button onClick={handleSlicePdf} disabled={loading} fullWidth>
+                    {loading ? "Slicing PDF..." : "Split PDF"}
+                  </Button>
+                </div>
+
+                {message && (
+                  <div style={{ marginTop: "16px" }}>
+                    <Alert message={message} type={messageType} />
                   </div>
                 )}
               </div>
-
-              {/* Range Input */}
-              {pdfFile && (
-                <div className="mt-5 mb-4">
-                  <label className="form-label fw-bold">Range:</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={pageRanges}
-                    onChange={(e) => setPageRanges(e.target.value)}
-                    placeholder="e.g., 1-3; 4-5; 6-10"
-                  />
-                  <small className="text-muted">
-                    Use semicolon (;) to separate into different files.
-                    Examples:
-                    <br />• <code>1-3; 4-5; 6-10</code> = 3 separate files
-                    <br />• <code>1-3,5,7</code> = 1 file with pages 1, 2, 3, 5,
-                    7
-                  </small>
-                </div>
-              )}
-
-              {/* Slice Button */}
-              {pdfFile && (
-                <div className="mt-4">
-                  <Button
-                    onClick={handleSlicePdf}
-                    disabled={loading || !pageRanges.trim()}
-                    fullWidth
-                  >
-                    {loading ? "Slicing PDF..." : "Slice PDF"}
-                  </Button>
-                </div>
-              )}
-
-              {message && <Alert message={message} type={messageType} />}
-            </div>
-
-            {/* How to use */}
-            <div className="how-to-use-card">
-              <div className="how-to-use-header">
-                <div className="how-to-use-icon">
-                  <svg viewBox="0 0 24 24" fill="none" strokeWidth="2">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
-                </div>
-                <h3 className="how-to-use-title">How to Slice PDF</h3>
-              </div>
-
-              <ol className="how-to-steps">
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">Upload your PDF file</p>
-                    <p className="how-to-step-description">
-                      Click &quot;Choose File&quot; button or drag & drop the PDF file you want to slice
-                    </p>
-                  </div>
-                </li>
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">Enter page range</p>
-                    <p className="how-to-step-description">
-                      Specify which pages you want to slice using the specified format
-                    </p>
-                  </div>
-                </li>
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">
-                      Use semicolon (;) to separate files
-                    </p>
-                    <p className="how-to-step-description">
-                      Each segment separated with ; will become a separate PDF file
-                    </p>
-                  </div>
-                </li>
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">
-                      Click &quot;Slice PDF&quot; and wait for the process to complete
-                    </p>
-                    <p className="how-to-step-description">
-                      All resulting files will automatically download with names &quot;sliced-part-1.pdf&quot;, &quot;sliced-part-2.pdf&quot;, etc.
-                    </p>
-                  </div>
-                </li>
-              </ol>
-
-              <div className="how-to-examples">
-                <div className="how-to-examples-title">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    strokeWidth="2"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 16v-4M12 8h.01" />
-                  </svg>
-                  Format Examples
-                </div>
-                <div className="how-to-example-item">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    strokeWidth="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>
-                    <code>1-3; 4-5; 6-10</code> produces 3 files with pages [1-3], [4-5], [6-10]
-                  </span>
-                </div>
-                <div className="how-to-example-item">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    strokeWidth="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>
-                    <code>1-3,5,7</code> produces 1 file with pages 1, 2, 3, 5, 7
-                  </span>
-                </div>
-                <div className="how-to-example-item">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    strokeWidth="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>
-                    <code>1,3,5; 2,4,6</code> produces 2 files with odd and even pages
-                  </span>
-                </div>
-                <div className="how-to-example-item">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    strokeWidth="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>
-                    <code>1-5</code> produces 1 file with pages 1 to 5
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
-        </div>
+        )}
       </Container>
     </>
   );
