@@ -1,10 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { PDFDocument } from 'pdf-lib';
-import Container from '@/components/Container';
-import Button from '@/components/Button';
-import Alert from '@/components/Alert';
+import { useState, useRef } from "react";
+import { PDFDocument } from "pdf-lib";
+import Container from "@/components/Container";
+import Button from "@/components/Button";
+import Alert from "@/components/Alert";
+import FeatureTitle from "@/components/FeatureTitle";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPlus,
+  faArrowsUpDown,
+  faCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface ImageFile {
   id: string;
@@ -16,40 +23,22 @@ interface ImageFile {
 export default function ImagesToPdfPage() {
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'danger'>('success');
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "danger">(
+    "success"
+  );
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const loadImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-
-      img.onload = () => {
-        resolve({ width: img.width, height: img.height });
-        URL.revokeObjectURL(url);
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error('Failed to load image'));
-      };
-
-      img.src = url;
-    });
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   };
 
   const addFiles = async (files: FileList | File[]) => {
-    const validImageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    const validImageTypes = ["image/png", "image/jpeg", "image/jpg"];
     const newFiles: ImageFile[] = [];
 
     for (const file of Array.from(files)) {
@@ -66,10 +55,10 @@ export default function ImagesToPdfPage() {
 
     if (newFiles.length > 0) {
       setImageFiles((prev) => [...prev, ...newFiles]);
-      setMessage('');
+      setMessage("");
     } else {
-      setMessage('Only PNG, JPG, and JPEG images are allowed!');
-      setMessageType('danger');
+      setMessage("Only PNG, JPG, and JPEG images are allowed!");
+      setMessageType("danger");
     }
   };
 
@@ -81,7 +70,7 @@ export default function ImagesToPdfPage() {
 
     // Reset input
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -111,7 +100,7 @@ export default function ImagesToPdfPage() {
 
   const handleRemoveFile = (id: string) => {
     setImageFiles((prev) => {
-      const file = prev.find(f => f.id === id);
+      const file = prev.find((f) => f.id === id);
       if (file) {
         URL.revokeObjectURL(file.url);
       }
@@ -149,13 +138,13 @@ export default function ImagesToPdfPage() {
       const url = URL.createObjectURL(file);
 
       img.onload = () => {
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         if (!ctx) {
-          reject(new Error('Failed to get canvas context'));
+          reject(new Error("Failed to get canvas context"));
           return;
         }
 
@@ -164,16 +153,16 @@ export default function ImagesToPdfPage() {
 
         canvas.toBlob((blob) => {
           if (!blob) {
-            reject(new Error('Failed to convert image'));
+            reject(new Error("Failed to convert image"));
             return;
           }
           blob.arrayBuffer().then(resolve).catch(reject);
-        }, 'image/png');
+        }, "image/png");
       };
 
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Failed to load image'));
+        reject(new Error("Failed to load image"));
       };
 
       img.src = url;
@@ -182,13 +171,13 @@ export default function ImagesToPdfPage() {
 
   const handleConvertToPdf = async () => {
     if (imageFiles.length === 0) {
-      setMessage('Please add at least one image!');
-      setMessageType('danger');
+      setMessage("Please add at least one image!");
+      setMessageType("danger");
       return;
     }
 
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
       const pdfDoc = await PDFDocument.create();
@@ -214,17 +203,22 @@ export default function ImagesToPdfPage() {
 
       // Save and download
       const pdfBytes = await pdfDoc.save();
-      const arrayBuffer = pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength) as ArrayBuffer;
-      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+      const arrayBuffer = pdfBytes.buffer.slice(
+        pdfBytes.byteOffset,
+        pdfBytes.byteOffset + pdfBytes.byteLength
+      ) as ArrayBuffer;
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = 'images.pdf';
+      link.download = "images.pdf";
       link.click();
 
-      setMessage(`Success! ${imageFiles.length} image(s) converted to PDF and downloaded.`);
-      setMessageType('success');
+      setMessage(
+        `Success! ${imageFiles.length} image(s) converted to PDF and downloaded.`
+      );
+      setMessageType("success");
 
       // Reload page after successful conversion
       setTimeout(() => {
@@ -232,11 +226,19 @@ export default function ImagesToPdfPage() {
       }, 1500);
     } catch (error: unknown) {
       console.error(error);
-      setMessage(error instanceof Error ? error.message : 'Error converting images to PDF.');
-      setMessageType('danger');
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Error converting images to PDF."
+      );
+      setMessageType("danger");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddMoreClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -258,238 +260,358 @@ export default function ImagesToPdfPage() {
         </div>
       )}
 
-      {/* Page Header */}
-      <section className="page-header">
-        <Container>
-          <div className="text-center">
-            <h1 className="mb-3">Convert Images to PDF</h1>
-            <p className="lead text-muted">
-              Upload multiple images and convert them into a single PDF document
-            </p>
-          </div>
-        </Container>
-      </section>
-
       {/* Main Content */}
       <Container>
+        {imageFiles.length === 0 && (
+          <FeatureTitle
+            title="Images to PDF"
+            description="Convert multiple images (PNG, JPG, JPEG) into a single PDF document"
+          />
+        )}
+
         <div className="row justify-content-center">
-          <div className="col-lg-8">
-            <div className="feature-card">
-              {/* Upload Area */}
-              <div
-                className={`pdf-upload-zone ${isDraggingOver ? 'dragging-over' : ''}`}
-                onDrop={handleFileDrop}
-                onDragOver={handleDragOverZone}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-              >
-                <div className="upload-icon mb-3">
-                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
-                  </svg>
-                </div>
-                <h5 className="mb-2">
-                  Drag & drop your images here <span className="text-muted">or click to upload</span>
-                </h5>
-                <p className="text-muted mb-3">Supports: PNG, JPG, JPEG</p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg"
-                  multiple
-                  onChange={handleFileSelect}
-                  style={{ display: 'none' }}
-                  id="image-file-input"
-                />
-                <label htmlFor="image-file-input" className="btn btn-primary mt-3">
-                  Choose Images
-                </label>
-              </div>
-
-              {/* Images List */}
-              {imageFiles.length > 0 && (
-                <div className="pdf-files-list mt-4">
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h6 className="mb-0 fw-bold">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <polyline points="21 15 16 10 5 21" />
-                      </svg>
-                      {imageFiles.length} Image{imageFiles.length > 1 ? 's' : ''} Ready
-                    </h6>
-                    <small className="text-muted">Drag to reorder</small>
+          <div className="col-lg-10">
+            {imageFiles.length === 0 ? (
+              <div className="feature-card">
+                {/* Upload Area */}
+                <div
+                  className={`pdf-upload-zone ${
+                    isDraggingOver ? "dragging-over" : ""
+                  }`}
+                  onDrop={handleFileDrop}
+                  onDragOver={handleDragOverZone}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                >
+                  <div className="upload-icon mb-3">
+                    <svg
+                      width="80"
+                      height="80"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
                   </div>
+                  <h5 className="mb-2">Drag & drop your images here</h5>
+                  <p className="text-muted mb-3">or</p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg"
+                    multiple
+                    onChange={handleFileSelect}
+                    style={{ display: "none" }}
+                    id="image-file-input"
+                  />
+                  <label htmlFor="image-file-input" className="btn btn-primary">
+                    Choose Images
+                  </label>
+                  <p className="text-muted mt-3" style={{ fontSize: "14px" }}>
+                    Supports: PNG, JPG, JPEG
+                  </p>
+                </div>
 
+                {message && <Alert message={message} type={messageType} />}
+              </div>
+            ) : (
+              <>
+                {/* Header with Add Button and Instructions */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "24px",
+                    padding: "20px",
+                    background: "#fff",
+                    borderRadius: "12px",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <div>
+                    <h5 className="mb-1 fw-bold" style={{ fontSize: "18px" }}>
+                      <FontAwesomeIcon
+                        icon={faCircle}
+                        style={{
+                          fontSize: "8px",
+                          color: "var(--primary-yellow)",
+                          marginRight: "8px",
+                        }}
+                      />
+                      {imageFiles.length} Image
+                      {imageFiles.length !== 1 ? "s" : ""} Selected
+                    </h5>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "#6c757d",
+                        margin: 0,
+                        marginLeft: "16px",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faArrowsUpDown}
+                        style={{ marginRight: "6px" }}
+                      />
+                      Drag images to change order
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                    <div style={{ position: "relative", display: "inline-block" }}>
+                      <button
+                        onClick={handleAddMoreClick}
+                        className="btn btn-outline-secondary btn-sm"
+                        style={{
+                          fontWeight: "600",
+                          borderRadius: "8px",
+                          padding: "8px 20px",
+                          transition: "all 0.3s ease",
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faPlus}
+                          style={{ marginRight: "6px" }}
+                        />
+                        Add More
+                      </button>
+                      {imageFiles.length > 0 && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "-10px",
+                            right: "-10px",
+                            background: "#dc3545",
+                            color: "white",
+                            borderRadius: "50%",
+                            width: "24px",
+                            height: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                            zIndex: 10,
+                          }}
+                        >
+                          {imageFiles.length}
+                        </span>
+                      )}
+                    </div>
+                    <Button
+                      onClick={handleConvertToPdf}
+                      disabled={loading || imageFiles.length === 0}
+                    >
+                      {loading
+                        ? "Converting..."
+                        : `Convert ${imageFiles.length} Image${
+                            imageFiles.length !== 1 ? "s" : ""
+                          } to PDF`}
+                    </Button>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg"
+                    multiple
+                    onChange={handleFileSelect}
+                    style={{ display: "none" }}
+                    id="image-file-input-more"
+                  />
+                </div>
+
+                {/* Images Grid */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(180px, 1fr))",
+                    gap: "24px",
+                    marginBottom: "32px",
+                  }}
+                >
                   {imageFiles.map((imageFile, index) => (
                     <div
                       key={imageFile.id}
-                      className={`pdf-file-item ${draggedIndex === index ? 'dragging' : ''}`}
                       draggable
                       onDragStart={() => handleDragStart(index)}
                       onDragEnd={handleDragEnd}
                       onDragOver={handleDragOver}
                       onDrop={() => handleDrop(index)}
+                      style={{
+                        position: "relative",
+                        opacity: draggedIndex === index ? 0.4 : 1,
+                        cursor: draggedIndex === index ? "grabbing" : "grab",
+                        transform:
+                          draggedIndex === index
+                            ? "scale(1.05) rotate(3deg)"
+                            : "scale(1) rotate(0deg)",
+                        transition:
+                          draggedIndex === index
+                            ? "opacity 0.2s ease, transform 0.1s ease"
+                            : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      }}
                     >
-                      <div className="d-flex align-items-center">
-                        <div className="drag-handle me-3">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="3" y1="9" x2="21" y2="9" />
-                            <line x1="3" y1="15" x2="21" y2="15" />
-                          </svg>
-                        </div>
-                        <div className="me-3">
+                      {/* Order Number Badge */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-12px",
+                          left: "-12px",
+                          width: "36px",
+                          height: "36px",
+                          background:
+                            "linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-yellow-dark) 100%)",
+                          color: "#000",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "16px",
+                          fontWeight: "700",
+                          border: "3px solid white",
+                          boxShadow: "0 4px 12px rgba(255, 193, 7, 0.4)",
+                          zIndex: 10,
+                          transition: "all 0.3s ease",
+                        }}
+                      >
+                        {index + 1}
+                      </div>
+
+                      {/* Image Card */}
+                      <div
+                        style={{
+                          background: "#fff",
+                          border: "2px solid #e9ecef",
+                          borderRadius: "12px",
+                          overflow: "hidden",
+                          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                          boxShadow:
+                            draggedIndex === index
+                              ? "0 20px 40px rgba(0,0,0,0.3)"
+                              : "0 2px 12px rgba(0,0,0,0.1)",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (draggedIndex !== index) {
+                            e.currentTarget.style.borderColor =
+                              "var(--primary-yellow)";
+                            e.currentTarget.style.boxShadow =
+                              "0 8px 24px rgba(255, 193, 7, 0.3)";
+                            e.currentTarget.style.transform =
+                              "translateY(-8px)";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (draggedIndex !== index) {
+                            e.currentTarget.style.borderColor = "#e9ecef";
+                            e.currentTarget.style.boxShadow =
+                              "0 2px 12px rgba(0,0,0,0.1)";
+                            e.currentTarget.style.transform = "translateY(0)";
+                          }
+                        }}
+                      >
+                        {/* Image Preview */}
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "200px",
+                            background: "#f8f9fa",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "hidden",
+                            position: "relative",
+                          }}
+                        >
                           <img
                             src={imageFile.url}
                             alt={imageFile.file.name}
                             style={{
-                              width: '60px',
-                              height: '60px',
-                              objectFit: 'cover',
-                              borderRadius: '8px',
-                              border: '2px solid #e0e0e0',
+                              maxWidth: "100%",
+                              maxHeight: "100%",
+                              objectFit: "contain",
+                              transition: "transform 0.3s ease",
+                              pointerEvents: "none",
                             }}
                           />
-                        </div>
-                        <div className="flex-grow-1">
-                          <div className="pdf-file-name">{imageFile.file.name}</div>
-                          <div className="pdf-file-size text-muted">{imageFile.size}</div>
-                        </div>
-                        <div className="pdf-file-actions">
+
+                          {/* Delete Button */}
                           <button
-                            className="btn btn-sm btn-outline-secondary me-2"
-                            title="Move up"
-                            disabled={index === 0}
-                            onClick={() => {
-                              if (index > 0) {
-                                const newFiles = [...imageFiles];
-                                [newFiles[index - 1], newFiles[index]] = [newFiles[index], newFiles[index - 1]];
-                                setImageFiles(newFiles);
-                              }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFile(imageFile.id);
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: "8px",
+                              right: "8px",
+                              width: "30px",
+                              height: "30px",
+                              borderRadius: "50%",
+                              border: "none",
+                              background: "rgba(220, 53, 69, 0.95)",
+                              color: "white",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "20px",
+                              fontWeight: "bold",
+                              transition: "all 0.2s ease",
+                              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = "scale(1.2)";
+                              e.currentTarget.style.background = "#dc3545";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "scale(1)";
+                              e.currentTarget.style.background =
+                                "rgba(220, 53, 69, 0.95)";
                             }}
                           >
-                            ↑
+                            ×
                           </button>
-                          <button
-                            className="btn btn-sm btn-outline-secondary me-2"
-                            title="Move down"
-                            disabled={index === imageFiles.length - 1}
-                            onClick={() => {
-                              if (index < imageFiles.length - 1) {
-                                const newFiles = [...imageFiles];
-                                [newFiles[index], newFiles[index + 1]] = [newFiles[index + 1], newFiles[index]];
-                                setImageFiles(newFiles);
-                              }
+                        </div>
+
+                        {/* File Info */}
+                        <div style={{ padding: "14px" }}>
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "600",
+                              color: "#212529",
+                              marginBottom: "4px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
                             }}
+                            title={imageFile.file.name}
                           >
-                            ↓
-                          </button>
-                          <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => handleRemoveFile(imageFile.id)}
-                            title="Remove"
-                          >
-                            ✕
-                          </button>
+                            {imageFile.file.name}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            {imageFile.size}
+                          </div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-              )}
 
-              {/* Convert Button */}
-              {imageFiles.length > 0 && (
-                <div className="mt-4">
-                  <Button
-                    onClick={handleConvertToPdf}
-                    disabled={loading}
-                    fullWidth
-                  >
-                    {loading ? 'Converting...' : `Convert ${imageFiles.length} Image${imageFiles.length > 1 ? 's' : ''} to PDF`}
-                  </Button>
-                </div>
-              )}
-
-              {message && <Alert message={message} type={messageType} />}
-            </div>
-
-            {/* How to use */}
-            <div className="how-to-use-card">
-              <div className="how-to-use-header">
-                <div className="how-to-use-icon">
-                  <svg viewBox="0 0 24 24" fill="none" strokeWidth="2">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
-                </div>
-                <h3 className="how-to-use-title">How to Convert Images to PDF</h3>
-              </div>
-
-              <ol className="how-to-steps">
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">Upload your images</p>
-                    <p className="how-to-step-description">
-                      Click &quot;Choose Images&quot; or drag & drop one or more images (PNG, JPG, JPEG)
-                    </p>
+                {message && (
+                  <div style={{ maxWidth: "600px", margin: "16px auto 0" }}>
+                    <Alert message={message} type={messageType} />
                   </div>
-                </li>
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">Arrange image order</p>
-                    <p className="how-to-step-description">
-                      Drag & drop to change order, or use ↑ ↓ buttons
-                    </p>
-                  </div>
-                </li>
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">Remove unwanted images (optional)</p>
-                    <p className="how-to-step-description">
-                      Click the ✕ button on the image you want to remove from the list
-                    </p>
-                  </div>
-                </li>
-                <li className="how-to-step">
-                  <div className="how-to-step-content">
-                    <p className="how-to-step-text">Click &quot;Convert to PDF&quot;</p>
-                    <p className="how-to-step-description">
-                      PDF will automatically download with the name &quot;images.pdf&quot;
-                    </p>
-                  </div>
-                </li>
-              </ol>
-
-              <div className="how-to-examples">
-                <div className="how-to-examples-title">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 16v-4M12 8h.01" />
-                  </svg>
-                  Useful Tips
-                </div>
-                <div className="how-to-example-item">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>Each image will become one PDF page matching the original image size</span>
-                </div>
-                <div className="how-to-example-item">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>The order of images in the list will become the page order in the PDF</span>
-                </div>
-                <div className="how-to-example-item">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>All images are processed in your browser, not uploaded to server</span>
-                </div>
-              </div>
-            </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </Container>
