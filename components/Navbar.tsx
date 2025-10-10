@@ -73,6 +73,11 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/add-text" className="dropdown-item">
+                    Add Text
+                  </Link>
+                </li>
+                <li>
                   <Link href="/images-to-pdf" className="dropdown-item">
                     Images to PDF
                   </Link>

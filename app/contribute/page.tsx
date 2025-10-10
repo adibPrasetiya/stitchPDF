@@ -5,40 +5,12 @@ export default function DonatePage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="page-header" style={{ paddingBottom: "4rem" }}>
+      <section className="page-header">
         <Container>
-          <div
-            className="text-center"
-            style={{ maxWidth: "800px", margin: "0 auto" }}
-          >
-            <h1
-              className="mb-4"
-              style={{ fontSize: "3rem", fontWeight: "800" }}
-            >
-              Support StitchPDF
-            </h1>
-            <p
-              className="lead"
-              style={{
-                fontSize: "1.25rem",
-                color: "#6c757d",
-                lineHeight: "1.8",
-              }}
-            >
-              StitchPDF is a passion project built to help people work with PDFs
-              without restrictions.
-              <br />
-              <strong>100% free, no ads, no tracking, no watermarks.</strong>
-            </p>
-            <p
-              style={{
-                fontSize: "1.1rem",
-                color: "#6c757d",
-                marginTop: "1.5rem",
-              }}
-            >
-              If you find this tool valuable, consider supporting its
-              development and hosting costs.
+          <div className="text-center">
+            <h1 className="mb-3">Support StitchPDF</h1>
+            <p className="lead text-muted">
+              Help us keep StitchPDF free and ad-free for everyone
             </p>
           </div>
         </Container>
@@ -144,199 +116,90 @@ export default function DonatePage() {
               </div>
             </div>
 
-            {/* Why Support Section */}
-            <div
-              style={{
-                padding: "3rem 0",
-                borderTop: "1px solid #e9ecef",
-                borderBottom: "1px solid #e9ecef",
-                marginBottom: "3rem",
-              }}
-            >
-              <h2
-                className="text-center mb-4"
-                style={{ fontSize: "2rem", fontWeight: "700" }}
+            {/* Intro Section */}
+            <div className="text-center mb-5">
+              <p
+                className="lead"
+                style={{
+                  fontSize: "1.1rem",
+                  color: "#6c757d",
+                  lineHeight: "1.8",
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                }}
               >
-                Why Support Matters
-              </h2>
-              <div className="row g-4">
-                <div className="col-md-6">
-                  <div style={{ padding: "1rem" }}>
-                    <h5
-                      style={{
-                        fontSize: "1.1rem",
-                        fontWeight: "600",
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      💰 Cover Hosting Costs
-                    </h5>
-                    <p
-                      style={{
-                        color: "#6c757d",
-                        fontSize: "0.95rem",
-                        lineHeight: "1.7",
-                      }}
-                    >
-                      Running a web application costs money. Domain, hosting,
-                      and CDN services need to be maintained.
-                    </p>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div style={{ padding: "1rem" }}>
-                    <h5
-                      style={{
-                        fontSize: "1.1rem",
-                        fontWeight: "600",
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      🚀 Enable New Features
-                    </h5>
-                    <p
-                      style={{
-                        color: "#6c757d",
-                        fontSize: "0.95rem",
-                        lineHeight: "1.7",
-                      }}
-                    >
-                      Your support gives me time to add features like PDF
-                      compression, digital signatures, and more.
-                    </p>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div style={{ padding: "1rem" }}>
-                    <h5
-                      style={{
-                        fontSize: "1.1rem",
-                        fontWeight: "600",
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      🛡️ Stay Ad-Free
-                    </h5>
-                    <p
-                      style={{
-                        color: "#6c757d",
-                        fontSize: "0.95rem",
-                        lineHeight: "1.7",
-                      }}
-                    >
-                      With community support, StitchPDF can remain completely
-                      free without resorting to ads or paywalls.
-                    </p>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div style={{ padding: "1rem" }}>
-                    <h5
-                      style={{
-                        fontSize: "1.1rem",
-                        fontWeight: "600",
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      ⚡ Faster Updates
-                    </h5>
-                    <p
-                      style={{
-                        color: "#6c757d",
-                        fontSize: "0.95rem",
-                        lineHeight: "1.7",
-                      }}
-                    >
-                      More resources mean faster bug fixes, performance
-                      improvements, and feature development.
-                    </p>
-                  </div>
-                </div>
-              </div>
+                StitchPDF is a passion project built to help people work with
+                PDFs without restrictions.
+                <br />
+                <strong>100% free, no ads, no tracking, no watermarks.</strong>
+              </p>
+              <p
+                style={{
+                  fontSize: "1rem",
+                  color: "#6c757d",
+                  marginTop: "1rem",
+                }}
+              >
+                If you find this tool valuable, consider supporting its
+                development and hosting costs.
+              </p>
             </div>
 
             {/* CTA Section */}
             <div
-              className="text-center"
+              className="card p-4 mb-4"
               style={{
-                padding: "3rem 2rem",
-                background: "linear-gradient(135deg, #fffbf0 0%, #fff8e1 100%)",
-                borderRadius: "16px",
-                marginBottom: "3rem",
+                background: "linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%)",
+                border: "2px solid #ffb74d",
               }}
             >
-              <h2
-                style={{
-                  fontSize: "2rem",
-                  fontWeight: "700",
-                  marginBottom: "1rem",
-                }}
-              >
-                Support the Project
-              </h2>
-              <p
-                style={{
-                  fontSize: "1.1rem",
-                  color: "#6c757d",
-                  maxWidth: "600px",
-                  margin: "0 auto 2.5rem",
-                  lineHeight: "1.7",
-                }}
-              >
-                Every contribution helps keep StitchPDF running and improving.
-                <br />
-                Choose your preferred platform below.
-              </p>
-
-              <div
-                className="donate-buttons"
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <a
-                  href="https://buymeacoffee.com/abu_ibrahim"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="donate-btn donate-btn-coffee"
-                  style={{ margin: "0.5rem" }}
-                >
-                  <Image
-                    src="/assets/images/coffee.png"
-                    alt="Coffee"
-                    width={24}
-                    height={24}
-                    style={{ objectFit: "contain" }}
-                  />
-                  Buy Me a Coffee
-                </a>
-                <a
-                  href="https://trakteer.id/abu_ibrahim"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="donate-btn donate-btn-trakteer"
-                  style={{ margin: "0.5rem" }}
-                >
-                  <Image
-                    src="/assets/images/paw.png"
-                    alt="Trakteer"
-                    width={24}
-                    height={24}
-                    style={{ objectFit: "contain" }}
-                  />
-                  Trakteer
-                </a>
+              <div className="text-center">
+                <h3 className="mb-3" style={{ color: "#5d4037" }}>
+                  Support StitchPDF
+                </h3>
+                <p className="mb-4" style={{ color: "#6d4c41" }}>
+                  StitchPDF is and will always be{" "}
+                  <strong>completely free</strong>. However, if you find this
+                  tool helpful and would like to support its development and
+                  hosting costs, you can buy me a coffee! ☕
+                </p>
+                <p className="text-muted mb-4">
+                  Your support helps keep this service running and motivates me
+                  to add more features!
+                </p>
+                <div className="donate-buttons">
+                  <a
+                    href="https://buymeacoffee.com/abu_ibrahim"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="donate-btn donate-btn-coffee"
+                  >
+                    <Image
+                      src="/assets/images/coffee.png"
+                      alt="Coffee"
+                      width={24}
+                      height={24}
+                      style={{ objectFit: "contain" }}
+                    />
+                    Buy Me a Coffee
+                  </a>
+                  <a
+                    href="https://trakteer.id/abu_ibrahim"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="donate-btn donate-btn-trakteer"
+                  >
+                    <Image
+                      src="/assets/images/paw.png"
+                      alt="Trakteer"
+                      width={24}
+                      height={24}
+                      style={{ objectFit: "contain" }}
+                    />
+                    Trakteer
+                  </a>
+                </div>
               </div>
-
-              <p
-                style={{
-                  fontSize: "0.9rem",
-                  color: "#8d6e63",
-                  fontStyle: "italic",
-                  margin: "0",
-                }}
-              >
-                Your support, no matter the size, makes a real difference. Thank
-                you! 🙏
-              </p>
             </div>
           </div>
         </div>

@@ -165,6 +165,26 @@ export default function Home() {
               href="/stamp"
             />
 
+            {/* Add Text to PDF */}
+            <ToolCard
+              icon={
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#673ab7"
+                  strokeWidth="2"
+                >
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <path d="M4 7h16M4 12h16M4 17h10" />
+                </svg>
+              }
+              title="Add Text"
+              description="Add customizable text boxes to your PDF"
+              iconBgColor="#ede7f6"
+              href="/add-text"
+            />
+
             {/* Insert to PDF */}
             <ToolCard
               icon={
