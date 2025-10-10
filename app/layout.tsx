@@ -5,10 +5,14 @@ import Navbar from "@/components/Navbar";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "StitchPDF - All-in-One Online PDF Editor",
+  title: "StitchPDF - Free All-in-One Client-Side PDF Editor",
   description:
-    "Professional online PDF tools for merging, slicing, and editing PDF files. Stitch your PDFs together with ease.",
-  icons: "assets/images/stitchPDF-logo.png",
+    "100% Free PDF tools that run entirely in your browser. Merge, split, edit, and manage PDF files with complete privacy. No uploads, no tracking, no watermarks - all processing happens client-side on your device.",
+  icons: {
+    icon: "/assets/images/stitchPDF-logo.png",
+    shortcut: "/assets/images/stitchPDF-logo.png",
+    apple: "/assets/images/stitchPDF-logo.png",
+  },
 };
 
 export default function RootLayout({
