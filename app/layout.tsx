@@ -13,6 +13,16 @@ export const metadata: Metadata = {
     shortcut: "/assets/images/stitchPDF-logo.png",
     apple: "/assets/images/stitchPDF-logo.png",
   },
+  keywords: [
+    "Free PDF editor",
+    "merge PDF",
+    "split PDF",
+    "edit PDF online",
+    "PDF tools",
+    "StitchPDF",
+    "client-side PDF",
+    "privacy-safe PDF editor",
+  ],
 };
 
 export default function RootLayout({
