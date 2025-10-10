@@ -5,6 +5,7 @@ import { PDFDocument } from "pdf-lib";
 import Container from "@/components/Container";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
+import FeatureTitle from "@/components/FeatureTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 
@@ -384,6 +385,13 @@ export default function SlicePage() {
 
       {/* Main Content */}
       <Container>
+        {!pdfFile && (
+          <FeatureTitle
+            title="Slice PDF"
+            description="Split your PDF into multiple files by selecting page ranges"
+          />
+        )}
+
         {!pdfFile ? (
           <div className="row justify-content-center">
             <div className="col-lg-10">

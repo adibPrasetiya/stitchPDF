@@ -37,7 +37,54 @@ export default function Navbar() {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
+          <ul className="navbar-nav ms-auto align-items-center">
+            {/* Emphasized Menu Items */}
+            <li className="nav-item">
+              <Link
+                href="/merge"
+                className="nav-link"
+                style={{
+                  color: "#dc3545",
+                  fontWeight: "600",
+                  fontSize: "16px",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#bb2d3b";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "#dc3545";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+              >
+                Merge PDF
+              </Link>
+            </li>
+
+            <li className="nav-item">
+              <Link
+                href="/slice"
+                className="nav-link"
+                style={{
+                  color: "#dc3545",
+                  fontWeight: "600",
+                  fontSize: "16px",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#bb2d3b";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "#dc3545";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+              >
+                Slice PDF
+              </Link>
+            </li>
+
             <li
               className="nav-item dropdown"
               onMouseEnter={() => setShowDropdown(true)}
@@ -49,19 +96,9 @@ export default function Navbar() {
                 role="button"
                 aria-expanded={showDropdown}
               >
-                Features
+                More Features
               </a>
               <ul className={`dropdown-menu ${showDropdown ? "show" : ""}`}>
-                <li>
-                  <Link href="/merge" className="dropdown-item">
-                    Merge PDF
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/slice" className="dropdown-item">
-                    Slice PDF
-                  </Link>
-                </li>
                 <li>
                   <Link href="/insert" className="dropdown-item">
                     Insert PDF

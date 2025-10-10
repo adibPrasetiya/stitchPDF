@@ -5,6 +5,7 @@ import { PDFDocument } from "pdf-lib";
 import Container from "@/components/Container";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
+import FeatureTitle from "@/components/FeatureTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
@@ -243,6 +244,13 @@ export default function MergePage() {
 
       {/* Main Content */}
       <Container>
+        {pdfFiles.length === 0 && (
+          <FeatureTitle
+            title="Merge PDF"
+            description="Combine multiple PDF files into a single document"
+          />
+        )}
+
         <div className="row justify-content-center">
           <div className="col-lg-10">
             {pdfFiles.length === 0 ? (
