@@ -135,7 +135,7 @@ export default function Navbar() {
 
             <li className="nav-item">
               <Link href="/contribute" className="nav-link donate-nav-btn">
-                ☕ Donate
+                ☕ Support Us
               </Link>
             </li>
           </ul>
