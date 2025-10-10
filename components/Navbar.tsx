@@ -115,6 +115,11 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/remove-pages" className="dropdown-item">
+                    Remove Pages
+                  </Link>
+                </li>
+                <li>
                   <Link href="/images-to-pdf" className="dropdown-item">
                     Images to PDF
                   </Link>
@@ -134,7 +139,7 @@ export default function Navbar() {
             </li>
 
             <li className="nav-item">
-              <Link href="/contribute" className="nav-link donate-nav-btn">
+              <Link href="/#donate" className="nav-link donate-nav-btn">
                 ☕ Support Us
               </Link>
             </li>

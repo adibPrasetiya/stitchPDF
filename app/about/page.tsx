@@ -1,6 +1,5 @@
 import Container from "@/components/Container";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function AboutPage() {
   return (
@@ -39,18 +38,19 @@ export default function AboutPage() {
                 to simplify your workflow.
               </p>
               <p className="mb-3">
-                <strong>Best of all, it&apos;s completely free to use.</strong> No
-                hidden fees, no subscriptions, no watermarks. Just
+                <strong>Best of all, it&apos;s completely free to use.</strong>{" "}
+                No hidden fees, no subscriptions, no watermarks. Just
                 straightforward PDF tools that work.
               </p>
               <p className="mb-0">
                 What makes StitchPDF special is that{" "}
                 <strong>everything runs 100% in your browser</strong> 🔒. Your
-                files never leave your device—there&apos;s no upload to servers, no
-                backend processing, and we don&apos;t store or collect any of your
-                documents. All the magic happens right on your computer using
-                client-side rendering, which means your privacy is completely
-                protected. Once the page loads, you can even use it offline!
+                files never leave your device—there&apos;s no upload to servers,
+                no backend processing, and we don&apos;t store or collect any of
+                your documents. All the magic happens right on your computer
+                using client-side rendering, which means your privacy is
+                completely protected. Once the page loads, you can even use it
+                offline!
               </p>
             </div>
 
@@ -76,53 +76,13 @@ export default function AboutPage() {
                   Your support helps keep this service running and motivates me
                   to add more features!
                 </p>
-                <div className="donate-buttons">
-                  <a
-                    href="https://buymeacoffee.com/abu_ibrahim"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="donate-btn donate-btn-coffee"
-                  >
-                    <Image
-                      src="/assets/images/coffee.png"
-                      alt="Coffee"
-                      width={24}
-                      height={24}
-                      style={{ objectFit: "contain" }}
-                    />
-                    Buy Me a Coffee
-                  </a>
-                  <a
-                    href="https://trakteer.id/abu_ibrahim"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="donate-btn donate-btn-trakteer"
-                  >
-                    <Image
-                      src="/assets/images/paw.png"
-                      alt="Trakteer"
-                      width={24}
-                      height={24}
-                      style={{ objectFit: "contain" }}
-                    />
-                    Trakteer
-                  </a>
-                </div>
+                <Link
+                  href="/#donate"
+                  className="btn btn-lg btn-primary"
+                >
+                  ☕ Support Us
+                </Link>
               </div>
-            </div>
-
-            {/* Thank You */}
-            <div className="text-center py-4">
-              <p className="text-muted mb-2">
-                Thank you for using StitchPDF! 🙏
-              </p>
-              <p className="text-muted small">
-                Love StitchPDF? Consider supporting us via the{" "}
-                <Link href="/contribute" className="text-primary">
-                  Donate
-                </Link>{" "}
-                page.
-              </p>
             </div>
           </div>
         </div>
