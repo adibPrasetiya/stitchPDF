@@ -3,6 +3,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Script from "next/script";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import RouteTracker from "@/components/RouteTracker";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "StitchPDF - Free All-in-One Client-Side PDF Editor",
@@ -33,6 +36,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <GoogleAnalytics />
+        <Suspense fallback={null}>
+          <RouteTracker />
+        </Suspense>
         <Navbar />
         {children}
         <Script
