@@ -8,6 +8,7 @@ import RouteTracker from "@/components/RouteTracker";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://stitch-pdf.adibprasetiya.com"),
   title: "StitchPDF - Free All-in-One Client-Side PDF Editor",
   description:
     "100% Free PDF tools that run entirely in your browser. Merge, split, edit, and manage PDF files with complete privacy. No uploads, no tracking, no watermarks - all processing happens client-side on your device.",
@@ -25,7 +26,54 @@ export const metadata: Metadata = {
     "StitchPDF",
     "client-side PDF",
     "privacy-safe PDF editor",
+    "PDF merger",
+    "PDF splitter",
+    "combine PDF",
+    "compress PDF",
+    "PDF converter",
   ],
+  authors: [{ name: "StitchPDF" }],
+  creator: "StitchPDF",
+  publisher: "StitchPDF",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://stitch-pdf.adibprasetiya.com",
+    siteName: "StitchPDF",
+    title: "StitchPDF - Free All-in-One Client-Side PDF Editor",
+    description:
+      "100% Free PDF tools that run entirely in your browser. Merge, split, edit, and manage PDF files with complete privacy. No uploads, no tracking, no watermarks.",
+    images: [
+      {
+        url: "/assets/images/stitchPDF-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "StitchPDF - Free PDF Editor",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StitchPDF - Free All-in-One Client-Side PDF Editor",
+    description:
+      "100% Free PDF tools that run entirely in your browser. Merge, split, edit, and manage PDF files with complete privacy.",
+    images: ["/assets/images/stitchPDF-logo.png"],
+    creator: "@stitchpdf",
+  },
+  alternates: {
+    canonical: "https://stitch-pdf.adibprasetiya.com",
+  },
 };
 
 export default function RootLayout({

@@ -3,8 +3,45 @@ import Container from "@/components/Container";
 import ToolCard from "@/components/ToolCard";
 
 export default function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "StitchPDF",
+    alternateName: "Stitch PDF",
+    url: "https://stitch-pdf.adibprasetiya.com",
+    description:
+      "100% Free PDF tools that run entirely in your browser. Merge, split, edit, and manage PDF files with complete privacy.",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Any",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    featureList: [
+      "Merge PDF files",
+      "Split PDF files",
+      "Convert PDF to images",
+      "Convert images to PDF",
+      "Add text to PDF",
+      "Stamp PDF",
+      "Insert pages to PDF",
+      "Remove pages from PDF",
+    ],
+    screenshot: "https://stitch-pdf.adibprasetiya.com/assets/images/stitchPDF-logo.png",
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.8",
+      ratingCount: "100",
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section */}
       <section className="hero-section">
         <Container className="text-center">
