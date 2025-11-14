@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import Script from "next/script";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import RouteTracker from "@/components/RouteTracker";
 import { Suspense } from "react";
+import BootstrapClient from "@/components/BootstrapClient";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://stitch-pdf.adibprasetiya.com"),
@@ -90,10 +90,7 @@ export default function RootLayout({
         </Suspense>
         <Navbar />
         {children}
-        <Script
-          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-          strategy="afterInteractive"
-        />
+        <BootstrapClient />
       </body>
     </html>
   );

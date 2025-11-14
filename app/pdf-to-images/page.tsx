@@ -7,7 +7,10 @@ import Button from "@/components/Button";
 import Alert from "@/components/Alert";
 import FeatureTitle from "@/components/FeatureTitle";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 interface ImageFormat {
   value: string;
