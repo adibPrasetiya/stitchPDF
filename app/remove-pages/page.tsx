@@ -10,10 +10,7 @@ import FeatureTitle from "@/components/FeatureTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url
-).toString();
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
 
 interface PageThumbnail {
   pageNumber: number;
