@@ -28,7 +28,8 @@ export default function Home() {
       "Insert pages to PDF",
       "Remove pages from PDF",
     ],
-    screenshot: "https://stitch-pdf.adibprasetiya.com/assets/images/stitchPDF-logo.png",
+    screenshot:
+      "https://stitch-pdf.adibprasetiya.com/assets/images/stitchPDF-logo.png",
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "4.8",
@@ -233,26 +234,6 @@ export default function Home() {
                 description="Insert new pages into PDF documents"
                 iconBgColor="#e8f5e9"
                 href="/insert"
-              />
-
-              {/* Sign PDF */}
-              <ToolCard
-                icon={
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#ff9800"
-                    strokeWidth="2"
-                  >
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <path d="M8 13h8M8 17h8M8 9h2" />
-                  </svg>
-                }
-                title="Sign PDF"
-                description="Digitally sign PDF documents"
-                iconBgColor="#fff3e0"
-                comingSoon
               />
 
               {/* Fill PDF Form */}
